@@ -8,9 +8,12 @@ class SayaTubeVideo
 
     public SayaTubeVideo(string title)
     {
-        this.id = GenerateRandomId();
-        this.title = title;
-        this.playCount = 0;
+        if (!string.IsNullOrEmpty(title) && title.Length <= 100)
+        {
+            this.title = title;
+            this.id = GenerateRandomId();
+            playCount = 0;
+        }
     }
 
     private int GenerateRandomId()
@@ -21,7 +24,21 @@ class SayaTubeVideo
 
     public void IncreasePlayCount(int count)
     {
-        playCount += count;
+        if (count < 0 || count > 10000000)
+        {
+            throw new ArgumentOutOfRangeException("Input harus di antara 0 dan 10.000.000.");
+        }
+        try
+        {
+            checked
+            {
+                playCount += count;
+            }
+        }
+        catch (OverflowException ex)
+        {
+            Console.WriteLine("Exception: " + ex.Message);
+        }
     }
 
     public void PrintVideoDetails()
@@ -37,8 +54,18 @@ class Program
         string namaPraktikan = "[Francisca_PRAKTIKAN]";
         string judulVideo = $"Tutorial Design By Contract - {namaPraktikan}";
 
-        SayaTubeVideo video = new SayaTubeVideo(judulVideo);
-        video.IncreasePlayCount(5); 
-        video.PrintVideoDetails();
+        try
+        {
+            SayaTubeVideo video = new SayaTubeVideo(judulVideo);
+            for (int i = 0; i < 3; i++) 
+            {
+                video.IncreasePlayCount(5000);
+            }
+            video.PrintVideoDetails();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Exception: " + ex.Message);
+        }
     }
 }
